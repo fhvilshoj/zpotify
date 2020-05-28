@@ -1,0 +1,10 @@
+name: spotify
+channels: 
+ - conda
+ - defaults
+ - conda-forge
+dependencies:
+ - python=3.7
+ - tekore=2.0.0
+ - inquirer=2.6.3
+
