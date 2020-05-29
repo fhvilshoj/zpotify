@@ -3,6 +3,7 @@ import tekore as tk
 import pathlib 
 import pickle
 import argparse 
+import inquirer
 
 def get_config():
     conf_path  = pathlib.Path.home().joinpath('.spotify.cnf')
@@ -35,6 +36,36 @@ def init():
     spotify.token = get_user_token()
     return spotify
 
+def albums(spotify, args):
+    format_str = "%s - %s"
+    def artists_str(artists):
+        st = "%-30s" % ("; ".join([a.name for a in artists])[:30])
+        return st
+
+    albums = [a.album for a in spotify.saved_albums(limit=20).items]
+    questions = [
+      inquirer.List('choosen',
+                    message="What album do you want to hear?",
+                    choices=[format_str % (artists_str(a.artists), a.name) for a in albums],
+                ),
+    ]
+    answers     = inquirer.prompt(questions)    
+    context_uri = next( (a.uri for a in albums if format_str % (artists_str(a.artists), a.name) == answers['choosen']) )
+    spotify.playback_start_context(context_uri)
+
+def analyze(spotify, args):
+    playlist = spotify.followed_playlists(limit=1).items[0]
+    track = spotify.playlist_items(playlist.id, limit=1).items[0].track
+    name = f'"{track.name}" from {playlist.name}'
+    if track.episode:
+        print(f'Cannot analyse episodes!\nGot {name}.')
+    elif track.track and track.is_local:
+        print(f'Cannot analyse local tracks!\nGot {name}.')
+    else:
+        print(f'Analysing {name}...\n')
+        analysis = spotify.track_audio_features(track.id)
+        print(repr(analysis))
+
 def play(spotify, args):
     spotify.playback_resume()
 
@@ -50,6 +81,12 @@ if __name__ == "__main__":
 
     p = subparsers.add_parser('pause')
     p.set_defaults(func=pause)
+
+    p = subparsers.add_parser('analyze')
+    p.set_defaults(func=analyze)
+
+    p = subparsers.add_parser('albums')
+    p.set_defaults(func=albums)
 
     spotify = init()
 

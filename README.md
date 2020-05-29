@@ -11,5 +11,6 @@
 ```bash
 > zpotify play
 > zpotify pause
+> zpotify albums 
 ```
 
