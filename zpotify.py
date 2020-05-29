@@ -53,6 +53,19 @@ def albums(spotify, args):
     context_uri = next( (a.uri for a in albums if format_str % (artists_str(a.artists), a.name) == answers['choosen']) )
     spotify.playback_start_context(context_uri)
 
+def playlists(spitify, args):
+    playlists = spotify.followed_playlists(limit=50).items
+    questions = [
+            inquirer.List('choosen',
+                message="What playlist do you want to hear?",
+                choices=[p.name for p in playlists]
+                ),
+        ]
+    answers = inquirer.prompt(questions)
+    context_uri = next( (p.uri for p in playlists if p.name == answers['choosen']) )
+    spotify.playback_start_context(context_uri)
+
+
 def analyze(spotify, args):
     playlist = spotify.followed_playlists(limit=1).items[0]
     track = spotify.playlist_items(playlist.id, limit=1).items[0].track
@@ -87,6 +100,9 @@ if __name__ == "__main__":
 
     p = subparsers.add_parser('albums')
     p.set_defaults(func=albums)
+
+    p = subparsers.add_parser('playlists')
+    p.set_defaults(func=playlists)
 
     spotify = init()
 

@@ -12,5 +12,6 @@
 > zpotify play
 > zpotify pause
 > zpotify albums 
+> zpotify playlists 
 ```
 
