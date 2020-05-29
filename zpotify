@@ -1,0 +1,5 @@
+#!/bin/bash
+set -e
+source /home/fhv/anaconda3/bin/activate spotify
+cd ~/applications/zpotify
+python zpotify.py "$@"
