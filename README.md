@@ -11,7 +11,10 @@
 ```bash
 > zpotify play
 > zpotify pause
+> zpotify next
+> zpotify previous
 > zpotify albums 
 > zpotify playlists 
+> zpotify status
 ```
 

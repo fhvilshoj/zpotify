@@ -53,7 +53,7 @@ def albums(spotify, args):
     context_uri = next( (a.uri for a in albums if format_str % (artists_str(a.artists), a.name) == answers['choosen']) )
     spotify.playback_start_context(context_uri)
 
-def playlists(spitify, args):
+def playlists(spotify, args):
     playlists = spotify.followed_playlists(limit=50).items
     questions = [
             inquirer.List('choosen',
@@ -65,6 +65,16 @@ def playlists(spitify, args):
     context_uri = next( (p.uri for p in playlists if p.name == answers['choosen']) )
     spotify.playback_start_context(context_uri)
 
+def status(spotify, args):
+    pb = spotify.playback()
+    print("%-15s" % "Playing:", pb.item.name, " by ", "; ".join([a.name for a in pb.item.artists]))
+    print("%-15s" % "On device:", pb.device.name)
+
+def next_track(spotify, args):
+    spotify.playback_next()
+
+def previous_track(spotify, args):
+    spotify.playback_previous()
 
 def analyze(spotify, args):
     playlist = spotify.followed_playlists(limit=1).items[0]
@@ -95,6 +105,12 @@ if __name__ == "__main__":
     p = subparsers.add_parser('pause')
     p.set_defaults(func=pause)
 
+    p = subparsers.add_parser('next')
+    p.set_defaults(func=next_track)
+
+    p = subparsers.add_parser('previous')
+    p.set_defaults(func=previous_track)
+
     p = subparsers.add_parser('analyze')
     p.set_defaults(func=analyze)
 
@@ -103,6 +119,9 @@ if __name__ == "__main__":
 
     p = subparsers.add_parser('playlists')
     p.set_defaults(func=playlists)
+    
+    p = subparsers.add_parser('status')
+    p.set_defaults(func=status)
 
     spotify = init()
 
